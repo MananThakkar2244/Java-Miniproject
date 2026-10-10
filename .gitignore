@@ -1,0 +1,9 @@
+target/
+.vscode/
+.classpath
+.project
+.settings/
+*.class
+*.xlsx
+*.xls
+data/
