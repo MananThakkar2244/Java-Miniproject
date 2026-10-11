@@ -19,14 +19,14 @@ A terminal-based Java application for tracking overdue loan accounts at a bank's
 
 ## Tech stack
 
-- Java 17
+- Java 25 LTS
 - Maven (build and dependency management)
 - [JLine](https://github.com/jline/jline3) 3.30.17 for terminal control (window size, key input)
 - Planned: Apache POI (Excel), Jakarta Mail (email), JDBC
 
 ## Requirements
 
-- JDK 17 or newer
+- JDK 25 LTS or newer
 - Maven 3.9 or newer
 - Windows or macOS, run from a real terminal (PowerShell, Windows Terminal, Terminal.app). The IDE's output panel will not work, because it is not a real console.
 
