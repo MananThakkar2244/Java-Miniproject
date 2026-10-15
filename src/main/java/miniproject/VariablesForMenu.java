@@ -15,12 +15,12 @@ interface VariablesForMenu {
         }
     }
 
-    final String newLine = System.lineSeparator();
-    final int terminalLength = getTerminalLength();
+    String NEWLINE = System.lineSeparator();
+    int TERMINALLENGTH = getTerminalLength();
 
     // terminal esc codes
-    final String eraseLine = "\033[2K";
-    final String hideCursor = "\033[?25l";
-    final String moveCursor = "\033[H";
-    final String eraseBelow = "\033[J";
+    String ERASELINE = "\033[2K";
+    String HIDECURSOR = "\033[?25l";
+    String MOVECURSOR = "\033[H";
+    String ERASEBELOW = "\033[J";
 }

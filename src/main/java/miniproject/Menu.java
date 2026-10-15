@@ -13,22 +13,51 @@ class Menu {
                 "Get customer details",
                 "Add new customer",
                 "Send Email",
-                "Options",
                 "Exit"
         };
 
+        String[] customerDetailsOptions = {
+                "Get details of a single customer",
+                "Get all customer details",
+                "Back"
+        };
+
+        String[] addCustomerOptions = {
+                "Add details of single customer",
+                "Import details from excel",
+                "Back"
+        };
+
         MenuScreen mainMenu = new MenuScreen(mainMenuOptions, title);
-        int terminalWidth = VariablesForMenu.terminalLength; // this is needed DO NOT REMOVE THIS
-        int index = 0;
+        MenuScreen custDetailsMenu = new MenuScreen(customerDetailsOptions, title);
+        MenuScreen addCustMenu = new MenuScreen(addCustomerOptions, title);
+
+        int terminalWidth = VariablesForMenu.TERMINALLENGTH; // this is needed DO NOT REMOVE THIS
 
         try (Terminal terminal = TerminalBuilder.builder().system(true).build()) {
             terminal.enterRawMode();
             while (true) {
-                mainMenu.drawMenu(index);
-                index = mainMenu.startInput(index, terminal);
-                if (index == -1) {
-                    System.out.println("Enter has been pressed");
-                    break;
+                int selectedIndex = mainMenu.getIndex(terminal);
+                switch (selectedIndex) {
+                    case 0:
+                        // Get customer details
+                        custDetailsMenu.getIndex(terminal);
+                        break;
+
+                    case 1:
+                        // Add new customer
+                        addCustMenu.getIndex(terminal);
+                        break;
+
+                    case 2:
+                        // Send email
+                        System.out.println("Send Email");
+                        break;
+
+                    case 3:
+                        // Exit
+                        System.out.println("Program exited");
+                        return;
                 }
             }
         } catch (Exception e) {

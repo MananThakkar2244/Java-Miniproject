@@ -17,7 +17,7 @@ class MenuScreen implements VariablesForMenu {
         return " ".repeat((width - option.length()) / 2) + option;
     }
 
-    int startInput(int selectedIndex, Terminal terminal) throws IOException {
+    private int startInput(int selectedIndex, Terminal terminal) throws IOException {
         int readKey = terminal.reader().read();
         if (readKey == 27) {
             readKey = terminal.reader().read();
@@ -35,22 +35,36 @@ class MenuScreen implements VariablesForMenu {
         return selectedIndex;
     }
 
+    int getIndex(Terminal terminal) throws IOException {
+        int index = 0;
+        int result = 0;
+        while (true) {
+            drawMenu(index);
+            result = startInput(index, terminal);
+            if (result == -1) {
+                return index;
+            } else {
+                index = result;
+            }
+        }
+    }
+
     void drawMenu(int selectedIndex) {
 
-        String line = "-".repeat(terminalLength);
+        String line = "-".repeat(TERMINALLENGTH);
         StringBuilder frame = new StringBuilder();
 
-        frame.append(hideCursor).append(moveCursor).append(eraseLine).append(line).append(newLine);
-        frame.append(eraseLine).append(newLine);
-        frame.append(eraseLine).append(leftPadding(title, terminalLength)).append(newLine);
-        frame.append(eraseLine).append(newLine);
-        frame.append(eraseLine).append(line).append(newLine).append(newLine);
+        frame.append(HIDECURSOR).append(MOVECURSOR).append(ERASELINE).append(line).append(NEWLINE);
+        frame.append(ERASELINE).append(NEWLINE);
+        frame.append(ERASELINE).append(leftPadding(title, TERMINALLENGTH)).append(NEWLINE);
+        frame.append(ERASELINE).append(NEWLINE);
+        frame.append(ERASELINE).append(line).append(NEWLINE).append(NEWLINE);
         for (int i = 0; i < options.length; i++) {
             String text = (i == selectedIndex) ? "> " + options[i] + " <" : "  " + options[i] + "  ";
-            frame.append(eraseLine).append(leftPadding(text, terminalLength)).append(newLine);
+            frame.append(ERASELINE).append(leftPadding(text, TERMINALLENGTH)).append(NEWLINE);
         }
-        frame.append(eraseLine).append(newLine);
-        frame.append(eraseLine).append(line).append(newLine).append(eraseBelow);
+        frame.append(ERASELINE).append(NEWLINE);
+        frame.append(ERASELINE).append(line).append(NEWLINE).append(ERASEBELOW);
         System.out.print(frame);
         System.out.flush();
     }
