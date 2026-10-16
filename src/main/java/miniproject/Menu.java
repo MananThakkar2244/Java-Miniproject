@@ -1,9 +1,8 @@
 package miniproject;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.*;;
 
 class Menu {
     public static void main(String[] args) throws IOException {
@@ -31,6 +30,7 @@ class Menu {
         MenuScreen mainMenu = new MenuScreen(mainMenuOptions, title);
         MenuScreen custDetailsMenu = new MenuScreen(customerDetailsOptions, title);
         MenuScreen addCustMenu = new MenuScreen(addCustomerOptions, title);
+        DBoperations db = new DBoperations();
 
         int terminalWidth = VariablesForMenu.TERMINALLENGTH; // this is needed DO NOT REMOVE THIS
 
@@ -41,12 +41,12 @@ class Menu {
                 switch (selectedIndex) {
                     case 0:
                         // Get customer details
-                        custDetailsMenu.getIndex(terminal);
+                        selectedIndex = custDetailsMenu.getIndex(terminal);
                         break;
 
                     case 1:
                         // Add new customer
-                        addCustMenu.getIndex(terminal);
+                        selectedIndex = addCustMenu.getIndex(terminal);
                         break;
 
                     case 2:
@@ -56,6 +56,7 @@ class Menu {
 
                     case 3:
                         // Exit
+                        db.connectDB();
                         System.out.println("Program exited");
                         return;
                 }
@@ -63,7 +64,7 @@ class Menu {
         } catch (Exception e) {
             System.out.println(e);
         } finally {
-            System.out.print("\033[?25h"); // show cursor
+            System.out.print(VariablesForMenu.SHOWCURSOR);
         }
     }
 }

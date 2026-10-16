@@ -18,9 +18,10 @@ interface VariablesForMenu {
     String NEWLINE = System.lineSeparator();
     int TERMINALLENGTH = getTerminalLength();
 
-    // terminal esc codes
+    // ANSI esc codes
     String ERASELINE = "\033[2K";
     String HIDECURSOR = "\033[?25l";
+    String SHOWCURSOR = "\033[?25h";
     String MOVECURSOR = "\033[H";
     String ERASEBELOW = "\033[J";
 }
