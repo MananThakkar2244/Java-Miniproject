@@ -21,6 +21,7 @@ import miniproject.model.AccountRecord;
 import miniproject.model.Customer;
 import miniproject.model.LoanAccount;
 
+// used for excel 
 public class ExcelExporter {
 
     private static final String[] HEADERS = {
@@ -41,6 +42,7 @@ public class ExcelExporter {
             "Paid Status"
     };
 
+    // used for excel 
     public void export(List<AccountRecord> records, File file) throws IOException {
         List<AccountRecord> sorted = new ArrayList<>(records);
         sorted.sort(Comparator.comparing(r -> r.getAccount().getAccountNumber()));

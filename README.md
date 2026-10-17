@@ -26,7 +26,7 @@ A terminal-based Java application for tracking overdue loan accounts at a bank's
 
 - JDK 17 or newer
 - Maven 3.9 or newer
-- MySQL Server (database `collecttrack_demo`)
+- MySQL Server (database `collecttrack`)
 - Windows or macOS, run from a real terminal (PowerShell, Windows Terminal, Terminal.app). The IDE output panel is not a real console and will not support raw terminal mode.
 
 ## Build and run

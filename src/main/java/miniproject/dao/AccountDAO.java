@@ -18,7 +18,7 @@ import miniproject.model.LoanAccount;
 
 public class AccountDAO implements AccountRepository {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/collecttrack_demo";
+    private static final String URL = "jdbc:mysql://localhost:3306/collecttrack";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 

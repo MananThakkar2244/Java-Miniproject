@@ -208,6 +208,7 @@ class Menu {
         }
     }
 
+    // used for excel 
     private static void handleExport(Terminal terminal, AccountRepository repo) throws IOException {
         List<AccountRecord> records = repo.findAll();
         if (records.isEmpty()) {
@@ -277,6 +278,7 @@ class Menu {
         }
     }
 
+    // used for excel 
     private static void handleExcelImport(Terminal terminal, AccountRepository repo) throws IOException {
         String path = promptLine(terminal, "Enter path to .xlsx file: ");
         System.out.println("Processing file, please wait...");
@@ -297,6 +299,7 @@ class Menu {
         pressAnyKey(terminal);
     }
 
+    // used for excel 
     private static void handleExcelUpdate(Terminal terminal, AccountRepository repo) throws IOException {
         String path = promptLine(terminal, "Enter path to updated .xlsx file: ");
         if (path.isEmpty()) {

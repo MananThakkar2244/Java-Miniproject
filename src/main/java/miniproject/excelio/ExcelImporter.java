@@ -18,8 +18,10 @@ import miniproject.exception.DuplicateAccountException;
 import miniproject.model.Customer;
 import miniproject.model.LoanAccount;
 
+// used for excel 
 public class ExcelImporter {
 
+    // used for excel 
     public ImportResult importFile(String path, AccountRepository repo) {
         ImportResult result = new ImportResult();
 

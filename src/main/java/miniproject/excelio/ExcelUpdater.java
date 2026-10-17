@@ -22,8 +22,10 @@ import miniproject.model.AccountRecord;
 import miniproject.model.Customer;
 import miniproject.model.LoanAccount;
 
+// used for excel 
 public class ExcelUpdater {
 
+    // used for excel 
     public UpdatePlan analyze(String path, AccountRepository repo) {
         UpdatePlan plan = new UpdatePlan();
 
