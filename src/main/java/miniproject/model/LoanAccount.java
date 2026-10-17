@@ -28,7 +28,7 @@ public abstract class LoanAccount implements Trackable {
         this.emisMissed = emisMissed;
         this.dpd = 0;
         this.bucket = "0-30";
-        this.paidStatus = emisMissed == 0 ? "Paid" : "Unpaid";
+        this.paidStatus = emisMissed == 0 ? "PAID" : "UNPAID";
     }
 
     public abstract double getInterestRate();
@@ -40,7 +40,7 @@ public abstract class LoanAccount implements Trackable {
         if (emisMissed <= 0) {
             this.dpd = 0;
             this.bucket = "0-30";
-            this.paidStatus = "Paid";
+            this.paidStatus = "PAID";
             return;
         }
 
@@ -62,7 +62,7 @@ public abstract class LoanAccount implements Trackable {
             this.bucket = "90+";
         }
 
-        this.paidStatus = "Unpaid";
+        this.paidStatus = "UNPAID";
     }
 
     @Override

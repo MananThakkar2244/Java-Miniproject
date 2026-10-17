@@ -12,6 +12,7 @@ import java.util.List;
 import miniproject.exception.AccountNotFoundException;
 import miniproject.exception.DataAccessException;
 import miniproject.exception.DuplicateAccountException;
+import miniproject.model.AccountRecord;
 import miniproject.model.Customer;
 import miniproject.model.LoanAccount;
 
@@ -94,7 +95,7 @@ public class AccountDAO implements AccountRepository {
     }
 
     @Override
-    public LoanAccount findByAccountNumber(String accountNumber) throws AccountNotFoundException {
+    public AccountRecord findByAccountNumber(String accountNumber) throws AccountNotFoundException {
         String sql = "SELECT la.*, c.name, c.address, c.phone, c.email "
                 + "FROM loan_account la JOIN customer c ON la.unique_id = c.unique_id "
                 + "WHERE la.account_number = ?";
@@ -106,7 +107,7 @@ public class AccountDAO implements AccountRepository {
                 if (!rs.next()) {
                     throw new AccountNotFoundException("Account not found: " + accountNumber);
                 }
-                return buildLoanAccount(rs);
+                return buildAccountRecord(rs);
             }
         } catch (AccountNotFoundException e) {
             throw e;
@@ -141,23 +142,56 @@ public class AccountDAO implements AccountRepository {
     }
 
     @Override
-    public List<LoanAccount> findAll() {
-        String sql = "SELECT * FROM loan_account";
-        List<LoanAccount> accounts = new ArrayList<>();
+    public List<AccountRecord> findAll() {
+        String sql = "SELECT la.*, c.name, c.address, c.phone, c.email "
+                + "FROM loan_account la JOIN customer c ON la.unique_id = c.unique_id";
+        List<AccountRecord> records = new ArrayList<>();
 
         try (Connection con = getConnection();
                 PreparedStatement ps = con.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                accounts.add(buildLoanAccount(rs));
+                records.add(buildAccountRecord(rs));
             }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to list accounts", e);
         }
-        return accounts;
+        return records;
     }
 
-    private LoanAccount buildLoanAccount(ResultSet rs) throws SQLException {
+    @Override
+    public List<AccountRecord> findByCustomerId(String uniqueId) throws AccountNotFoundException {
+        String sql = "SELECT la.*, c.name, c.address, c.phone, c.email "
+                + "FROM loan_account la JOIN customer c ON la.unique_id = c.unique_id "
+                + "WHERE la.unique_id = ?";
+        List<AccountRecord> records = new ArrayList<>();
+
+        try (Connection con = getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, uniqueId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    records.add(buildAccountRecord(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to find accounts for customer: " + uniqueId, e);
+        }
+
+        if (records.isEmpty()) {
+            throw new AccountNotFoundException("No accounts found for customer: " + uniqueId);
+        }
+
+        return records;
+    }
+
+    private AccountRecord buildAccountRecord(ResultSet rs) throws SQLException {
+        Customer customer = new Customer(
+                rs.getString("unique_id"),
+                rs.getString("name"),
+                rs.getString("address"),
+                rs.getString("phone"),
+                rs.getString("email"));
         LoanAccount account = LoanAccount.fromCode(
                 rs.getString("loan_type"),
                 rs.getString("account_number"),
@@ -168,6 +202,6 @@ public class AccountDAO implements AccountRepository {
                 rs.getInt("due_day"),
                 rs.getInt("emis_missed"));
         account.calculateDpd(LocalDate.now());
-        return account;
+        return new AccountRecord(customer, account);
     }
 }

@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import miniproject.dao.AccountRepository;
+import miniproject.exception.DataAccessException;
 import miniproject.exception.DuplicateAccountException;
 import miniproject.model.Customer;
 import miniproject.model.LoanAccount;
@@ -68,6 +69,9 @@ public class ExcelImporter {
                 processRow(row, i + 1, columns, repo, result);
             }
 
+        } catch (DataAccessException e) {
+            result.addFailure(0, "Database is unreachable: " + e.getMessage());
+            return result;
         } catch (IOException e) {
             result.addFailure(0, "Failed to read file: " + e.getMessage());
         }
@@ -153,9 +157,37 @@ public class ExcelImporter {
 
             int emisMissed = 1;
             if (columns.containsKey("emis missed")) {
-                int val = getIntValue(row, columns, "emis missed");
-                if (val > 0) {
+                Integer colIndex = columns.get("emis missed");
+                Cell cell = colIndex != null ? row.getCell(colIndex) : null;
+                if (cell == null || cell.getCellType() == CellType.BLANK) {
+                    result.addFailure(rowNum, "EMIs Missed must be 1-3, got: blank");
+                    return;
+                }
+                String raw = FORMATTER.formatCellValue(cell).trim();
+                if (raw.isEmpty()) {
+                    result.addFailure(rowNum, "EMIs Missed must be 1-3, got: blank");
+                    return;
+                }
+                try {
+                    int val;
+                    if (cell.getCellType() == CellType.NUMERIC) {
+                        double d = cell.getNumericCellValue();
+                        if (d != Math.floor(d)) {
+                            result.addFailure(rowNum, "EMIs Missed must be 1-3, got: " + raw);
+                            return;
+                        }
+                        val = (int) d;
+                    } else {
+                        val = Integer.parseInt(raw);
+                    }
+                    if (val < 1 || val > 3) {
+                        result.addFailure(rowNum, "EMIs Missed must be 1-3, got: " + raw);
+                        return;
+                    }
                     emisMissed = val;
+                } catch (NumberFormatException e) {
+                    result.addFailure(rowNum, "EMIs Missed must be 1-3, got: " + raw);
+                    return;
                 }
             }
 
@@ -171,6 +203,8 @@ public class ExcelImporter {
             repo.insertAccount(customer, account);
             result.addImported();
 
+        } catch (DataAccessException e) {
+            throw e;
         } catch (DuplicateAccountException e) {
             result.addDuplicate();
         } catch (IllegalArgumentException e) {

@@ -1,9 +1,10 @@
+bin/
 target/
 .vscode/
+*.class
 .classpath
 .project
 .settings/
-*.class
 *.xlsx
 *.xls
 data/

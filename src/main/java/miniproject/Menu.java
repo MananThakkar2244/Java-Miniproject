@@ -13,6 +13,7 @@ import miniproject.dao.AccountDAO;
 import miniproject.dao.AccountRepository;
 import miniproject.excelio.ExcelImporter;
 import miniproject.excelio.ImportResult;
+import miniproject.exception.DataAccessException;
 
 class Menu {
     public static void main(String[] args) throws IOException {
@@ -43,6 +44,8 @@ class Menu {
 
         int terminalWidth = VariablesForMenu.TERMINALLENGTH; // this is needed DO NOT REMOVE THIS
 
+        AccountRepository repo = new AccountDAO();
+
         try (Terminal terminal = TerminalBuilder.builder().system(true).build()) {
             terminal.enterRawMode();
             while (true) {
@@ -50,20 +53,38 @@ class Menu {
                 switch (selectedIndex) {
                     case 0:
                         // Get customer details
-                        selectedIndex = custDetailsMenu.getIndex(terminal);
+                        try {
+                            selectedIndex = custDetailsMenu.getIndex(terminal);
+                        } catch (DataAccessException e) {
+                            System.out.println("Database error: " + e.getMessage());
+                        } catch (Exception e) {
+                            System.out.println("Error: " + e.getMessage());
+                        }
                         break;
 
                     case 1:
                         // Add new customer
-                        selectedIndex = addCustMenu.getIndex(terminal);
-                        if (selectedIndex == 1) {
-                            handleExcelImport(terminal);
+                        try {
+                            selectedIndex = addCustMenu.getIndex(terminal);
+                            if (selectedIndex == 1) {
+                                handleExcelImport(terminal, repo);
+                            }
+                        } catch (DataAccessException e) {
+                            System.out.println("Database error: " + e.getMessage());
+                        } catch (Exception e) {
+                            System.out.println("Error: " + e.getMessage());
                         }
                         break;
 
                     case 2:
                         // Send email
-                        System.out.println("Send Email");
+                        try {
+                            System.out.println("Send Email");
+                        } catch (DataAccessException e) {
+                            System.out.println("Database error: " + e.getMessage());
+                        } catch (Exception e) {
+                            System.out.println("Error: " + e.getMessage());
+                        }
                         break;
 
                     case 3:
@@ -79,12 +100,8 @@ class Menu {
         }
     }
 
-    private static void handleExcelImport(Terminal terminal) throws IOException {
+    private static String promptLine(Terminal terminal, String prompt) {
         Attributes savedAttributes = terminal.getAttributes();
-
-        terminal.setAttributes(terminal.enterRawMode());
-        Attributes cooked = new Attributes(savedAttributes);
-        terminal.setAttributes(cooked);
 
         System.out.print(VariablesForMenu.SHOWCURSOR);
         System.out.print(VariablesForMenu.MOVECURSOR);
@@ -98,11 +115,18 @@ class Menu {
                 .terminal(terminal)
                 .parser(parser)
                 .build();
-        String path = reader.readLine("Enter path to .xlsx file: ").trim();
+        String line = reader.readLine(prompt).trim();
+
+        terminal.setAttributes(savedAttributes);
+        terminal.enterRawMode();
+        return line;
+    }
+
+    private static void handleExcelImport(Terminal terminal, AccountRepository repo) throws IOException {
+        String path = promptLine(terminal, "Enter path to .xlsx file: ");
         System.out.println("Processing file, please wait...");
         System.out.flush();
 
-        AccountRepository repo = new AccountDAO();
         ExcelImporter importer = new ExcelImporter();
         ImportResult result = importer.importFile(path, repo);
 
@@ -126,8 +150,6 @@ class Menu {
         System.out.println("Press any key to continue...");
         System.out.flush();
 
-        terminal.setAttributes(savedAttributes);
-        terminal.enterRawMode();
         terminal.reader().read();
     }
 }
