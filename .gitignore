@@ -8,3 +8,4 @@ target/
 *.xlsx
 *.xls
 data/
+.github/modernize/

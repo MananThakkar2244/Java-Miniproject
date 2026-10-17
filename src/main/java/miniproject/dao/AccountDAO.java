@@ -95,6 +95,58 @@ public class AccountDAO implements AccountRepository {
     }
 
     @Override
+    public void updateRecord(Customer customer, LoanAccount account) throws AccountNotFoundException {
+        String updateCustomer = "UPDATE customer SET name = ?, address = ?, phone = ?, email = ? WHERE unique_id = ?";
+        String updateAccount = "UPDATE loan_account SET loan_type = ?, open_date = ?, loan_amount = ?, emi_amount = ?, "
+                + "due_day = ?, emis_missed = ?, dpd = ?, dpd_bucket = ?, paid_status = ? WHERE account_number = ?";
+
+        try (Connection con = getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                try (PreparedStatement ps = con.prepareStatement(updateCustomer)) {
+                    ps.setString(1, customer.getName());
+                    ps.setString(2, customer.getAddress());
+                    ps.setString(3, customer.getPhone());
+                    ps.setString(4, customer.getEmail());
+                    ps.setString(5, customer.getUniqueId());
+                    ps.executeUpdate();
+                }
+
+                int rows;
+                try (PreparedStatement ps = con.prepareStatement(updateAccount)) {
+                    ps.setString(1, account.getLoanTypeCode());
+                    ps.setDate(2, java.sql.Date.valueOf(account.getOpenDate()));
+                    ps.setInt(3, (int) account.getLoanAmount());
+                    ps.setInt(4, (int) account.getEmiAmount());
+                    ps.setInt(5, account.getDueDay());
+                    ps.setInt(6, account.getEmisMissed());
+                    ps.setInt(7, account.getDpd());
+                    ps.setString(8, account.getBucket());
+                    ps.setString(9, account.getPaidStatus());
+                    ps.setString(10, account.getAccountNumber());
+                    rows = ps.executeUpdate();
+                }
+
+                if (rows == 0) {
+                    con.rollback();
+                    throw new AccountNotFoundException("Account not found: " + account.getAccountNumber());
+                }
+
+                con.commit();
+            } catch (AccountNotFoundException e) {
+                throw e;
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            }
+        } catch (AccountNotFoundException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to update account: " + account.getAccountNumber(), e);
+        }
+    }
+
+    @Override
     public AccountRecord findByAccountNumber(String accountNumber) throws AccountNotFoundException {
         String sql = "SELECT la.*, c.name, c.address, c.phone, c.email "
                 + "FROM loan_account la JOIN customer c ON la.unique_id = c.unique_id "
